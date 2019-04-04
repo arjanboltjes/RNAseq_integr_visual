@@ -24,7 +24,6 @@ ae <- read_sav(path)
 
 ## Tidy data
 ```{r tidy_ae}
-# Subset pilot data patients from AE data and add those - including identifier identical to counts column names - to metadata df
 names(ae) %<>%
      str_replace_all("\\.", "_") %>%    ## remove "." from variable names, replace with "_"
      tolower()
