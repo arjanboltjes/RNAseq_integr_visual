@@ -1,0 +1,61 @@
+---
+title: 'Read Athero-Express SPSS file into R'
+author: "Arjan Boltjes"
+date: "04/04/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+```{r load_packages}
+library(tidyverse)
+library(haven)
+```
+
+## Import data
+```{r import_ae}
+# Athero-Express
+path <- "/home/arjan/Cardio/Athero-Express/2018-1NEW_AtheroExpressDatabase_ScientificAE_230218.sav"
+ae <- read_sav(path)
+```
+
+## Tidy data
+```{r tidy_ae}
+# Subset pilot data patients from AE data and add those - including identifier identical to counts column names - to metadata df
+names(ae) %<>%
+     str_replace_all("\\.", "_") %>%    ## remove "." from variable names, replace with "_"
+     tolower()
+
+# Replace value codes by value labels 
+ae %<>% haven::as_factor() %>%
+     mutate(study_number = str_replace(study_number, "([0-9]+)", "ae\\1")) %>%  
+     dplyr::rename(sex = gender) %>%
+     print()
+
+## Change the df variable classes by hand
+manual_classses_ae <- read_tsv("Variable_classes_AB.csv") %>%    ## make sure this .csv is in the currect directory, set WD, or set path to file
+     gather() %>%
+     rename(variables = 1, class_of_variable = 2) %>%
+     mutate(class_of_variable = str_replace_all(class_of_variable, c("numerical" = "numeric"))) %>%
+     print()
+
+## Check whether column variables of manual_classes_ae corresponds to colnames ae
+all(manual_classses_ae$variables == colnames(ae))
+
+## if not in right order:
+# manual_classses_ae <- manual_classses_ae[match(manual_classses_ae$variables, names(ae)),]
+# ae_copy <- ae ## create ae copy for double checking
+
+## Edit class types of ae variables
+funs <- sapply(paste0("as.", manual_classses_ae$class_of_variable), match.fun)
+ae[] <- Map(function(dd, f) f(as.character(dd)), ae, funs)
+```
+
+## Dimensions ae
+```{r dim_ae}
+dim(ae)
+ae
+```
