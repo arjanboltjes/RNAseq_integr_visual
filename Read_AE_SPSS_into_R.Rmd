@@ -1,7 +1,7 @@
 ---
 title: 'Read Athero-Express SPSS file into R'
 author: "Arjan Boltjes"
-date: "04/04/2019"
+date: "30/04/2019"
 output: html_document
 ---
 
@@ -18,7 +18,7 @@ library(haven)
 ## Import data
 ```{r import_ae}
 # Athero-Express
-path <- "/home/arjan/Cardio/Athero-Express/2018-1NEW_AtheroExpressDatabase_ScientificAE_230218.sav"
+path <- "/home/arjan/Cardio/Athero-Express/2019-1NEW_AtheroExpressDatabase_ScientificAE_23042019.sav"
 ae <- read_sav(path)
 ```
 
@@ -35,7 +35,7 @@ ae %<>% haven::as_factor() %>%
      print()
 
 ## Change the df variable classes by hand
-manual_classses_ae <- read_tsv("Variable_classes_AB.csv") %>%    ## make sure this .csv is in the currect directory, set WD, or set path to file
+manual_classses_ae <- read_tsv("20190430_variable_classes_AB.csv") %>%    ## make sure this .csv is in the currect directory, set WD, or set path to file
      gather() %>%
      rename(variables = 1, class_of_variable = 2) %>%
      mutate(class_of_variable = str_replace_all(class_of_variable, c("numerical" = "numeric"))) %>%
